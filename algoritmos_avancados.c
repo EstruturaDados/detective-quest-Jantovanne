@@ -1,22 +1,147 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
 
 // Desafio Detective Quest
 // Tema 4 - Árvores e Tabela Hash
 // Este código inicial serve como base para o desenvolvimento das estruturas de navegação, pistas e suspeitos.
 // Use as instruções de cada região para desenvolver o sistema completo com árvore binária, árvore de busca e tabela hash.
 
+
+typedef struct No
+{
+    char nome[20];
+    struct No *esquerda, *direita;
+} No;
+
+// Função para criar uma nova sala
+void criarSala(No* sala, char nome[20]) {
+    strcpy(sala->nome, nome);
+    sala->esquerda = NULL;
+    sala->direita = NULL;
+}
+
+// Função para inserir salas na árvore de forma fixa
+No* insereSala() {
+    char nome[6][20] = {"Hall", "Biblioteca", "Cozinha", "Sótão", "Jardim", "Sala de Estar"};
+    No* raiz = NULL;
+
+    // insere os nomes na arvore de forma fixa
+    for (int i = 0; i < 6; i++) {
+
+        No* novaSala = (No*)malloc(sizeof(No));
+        if (novaSala == NULL) {
+        printf("Erro ao alocar memória para a sala.\n");
+        exit(1);
+        }
+        criarSala(novaSala, nome[i]);
+        if (raiz == NULL) {
+            raiz = novaSala;
+        } else {
+            // inserção por ordem alfabética
+            No* atual = raiz;
+            while (1) {
+                if (strcmp(novaSala->nome, atual->nome) < 0) {
+                    if (atual->esquerda == NULL) {
+                        atual->esquerda = novaSala;
+                        break;
+                    } else {
+                        atual = atual->esquerda;
+                    }
+                } else {
+                    if (atual->direita == NULL) {
+                        atual->direita = novaSala;
+                        break;
+                    } else {
+                        atual = atual->direita;
+                    }
+                }
+            }
+        }
+    }
+
+    return raiz;
+}
+
+// Função para navegar pela arvore
+void imprimirArvore(No* sala, int nivel, char prefixo) {
+    if (sala == NULL && nivel == 0) {
+        printf("Arvore vazia.\n");
+        return;
+    } else if (sala == NULL) {
+        return;
+    }
+    for (int i = 0; i < nivel; i++) {
+        printf("        ");
+    }
+    if (nivel == 0){
+        printf("Raiz: %s\n", sala->nome);
+    } else {
+        printf("%c - %s\n", prefixo, sala->nome);
+    }
+    imprimirArvore(sala->esquerda, nivel + 1, 'E');
+    imprimirArvore(sala->direita, nivel + 1, 'D');
+
+}
+
+
+
+
+void menu(No* sala) {
+
+    No* salaNavegada = sala;
+    int opcao;
+
+    do
+    {
+        printf("------------\n");
+        printf("Menu:\n");
+        printf("------------\n");
+        printf("1 - ir para a esquerda (e)\n");
+        printf("2 - ir para a direita (d)\n");
+        printf("0 - sair (s)\n");
+        scanf("%d", &opcao);
+        getchar();
+
+        switch (opcao)
+        {
+        case 1:
+            if (salaNavegada->esquerda != NULL) {
+                salaNavegada = salaNavegada->esquerda;
+                printf("Você está na sala: %s\n", salaNavegada->nome);
+            } else {
+                printf("Não há sala à esquerda.\n");
+            }
+            break;
+        case 2:
+            if (salaNavegada->direita != NULL) {
+                salaNavegada = salaNavegada->direita;
+                printf("Você está na sala: %s\n", salaNavegada->nome);
+            } else {
+                printf("Não há sala à direita.\n");
+            }
+            break;
+        default:
+            printf("Opção inválida.\n");
+            break;
+        }
+    } while (opcao != 0);
+}
+
 int main() {
 
     // 🌱 Nível Novato: Mapa da Mansão com Árvore Binária
-    //
-    // - Crie uma struct Sala com nome, e dois ponteiros: esquerda e direita.
-    // - Use funções como criarSala(), conectarSalas() e explorarSalas().
-    // - A árvore pode ser fixa: Hall de Entrada, Biblioteca, Cozinha, Sótão etc.
-    // - O jogador deve poder explorar indo à esquerda (e) ou à direita (d).
-    // - Finalize a exploração com uma opção de saída (s).
-    // - Exiba o nome da sala a cada movimento.
-    // - Use recursão ou laços para caminhar pela árvore.
-    // - Nenhuma inserção dinâmica é necessária neste nível.
+    setlocale(LC_ALL,  ".UTF-8");
+
+    No* sala = insereSala();
+
+    printf("=================================\n");
+    printf("Bem vindo ao DETETIVE QUEST\n");
+    printf("=================================\n\n");
+    imprimirArvore(sala, 0, 'R');
+    menu(sala);
+
 
     // 🔍 Nível Aventureiro: Armazenamento de Pistas com Árvore de Busca
     //
